@@ -54,7 +54,7 @@ export async function generateMetadata({ params }) {
 async function getSingleHouseData(propertyname) {
   // Decode the propertyname to handle spaces correctly
   const decodedPropertyName = decodeURIComponent(propertyname);
-  const res = await fetch(`http://localhost:3000/api/list/${encodeURIComponent(decodedPropertyName)}`, {
+  const res = await fetch(`api/list/${encodeURIComponent(decodedPropertyName)}`, {
     cache: 'no-store'
   });
 

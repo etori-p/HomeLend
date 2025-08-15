@@ -29,7 +29,7 @@ export const metadata = {
 };
 
 async function getAllHouseData() {
-  const res = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/list', {
+  const res = await fetch('api/list', {
     next: { revalidate: 300 }
   });
 
@@ -50,7 +50,7 @@ async function getUserFavoriteIds(session) {
     const headersList = await headers(); 
     const cookie = headersList.get('cookie'); 
 
-    const res = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/user/favorites', {
+    const res = await fetch('api/user/favorites', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
