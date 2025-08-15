@@ -9,7 +9,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
 import { headers } from 'next/headers';
 
-// Metadata for this specific page
+
 export const metadata = {
   title: 'All Properties | HomeLend',
   description: 'Browse all properties for rent, including apartments, houses, and studios. Use our powerful search and filter tools to find your perfect home in any neighborhood.',
@@ -29,8 +29,8 @@ export const metadata = {
 };
 
 async function getAllHouseData() {
-  const res = await fetch('http://localhost:3000/api/list', {
-    next: { revalidate: 300 } // Revalidate data every 5 minutes
+  const res = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/list', {
+    next: { revalidate: 300 }
   });
 
   if (!res.ok) {
@@ -41,25 +41,24 @@ async function getAllHouseData() {
   return res.json();
 }
 
-// Function to fetch user's favorite post IDs on the server
+// Fetch user's favorite post IDs on the server
 async function getUserFavoriteIds(session) {
   if (!session || !session.user || !session.user.email) {
-    return new Set(); // Return empty set if not authenticated
+    return new Set(); 
   }
   try {
-    const headersList = await headers(); // Await headers() call
-    const cookie = headersList.get('cookie'); // Extract the cookie header
+    const headersList = await headers(); 
+    const cookie = headersList.get('cookie'); 
 
-    const res = await fetch('http://localhost:3000/api/user/favorites', {
+    const res = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/user/favorites', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(cookie && { 'Cookie': cookie }), // Conditionally add the Cookie header
+        ...(cookie && { 'Cookie': cookie }), 
       },
     });
 
     if (!res.ok) {
-      // Log the full response text for better debugging
       console.error('Failed to fetch user favorite IDs on server:', await res.text());
       return new Set();
     }
@@ -74,27 +73,27 @@ async function getUserFavoriteIds(session) {
 
 // HouseListPage is an async Server Component, receiving searchParams
 export default async function HouseListPage({ searchParams }) {
-  // AWAIT searchParams before accessing its properties
+ 
   const awaitedSearchParams = await searchParams;
 
-  // Get session on the server
-  const session = await getServerSession(authOptions);
-  const userFavoriteIds = await getUserFavoriteIds(session); // Fetch favorite IDs
 
-  // Fetch all posts - this causes the loading.jsx to display while it runs
+  const session = await getServerSession(authOptions);
+  const userFavoriteIds = await getUserFavoriteIds(session); 
+
+
   const allHouseListings = await getAllHouseData();
 
-  // Extract filter parameters from awaitedSearchParams (URL query parameters)
+ 
   const searchTerm = awaitedSearchParams.search || '';
   const propertyTypeFilter = awaitedSearchParams.propertyType || 'Any';
   const bedroomsFilter = awaitedSearchParams.bedrooms || 'Any';
   const minPrice = awaitedSearchParams.minPrice || '';
   const maxPrice = awaitedSearchParams.maxPrice || '';
 
-  // The key part: Check for a 'location' search parameter
+ 
   const locationFilter = awaitedSearchParams.location || '';
 
-  // Filtering logic (still performed on the server after fetching all data)
+
   const filteredListings = allHouseListings.filter(Listing => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
 
@@ -155,8 +154,8 @@ export default async function HouseListPage({ searchParams }) {
                   />
                   {/* Favorite Button (Client Component) */}
                   <FavoriteButton
-                    postId={post._id.toString()} // Pass post ID as string
-                    initialIsFavorited={userFavoriteIds.has(post._id.toString())} // Check if this post is favorited
+                    postId={post._id.toString()} 
+                    initialIsFavorited={userFavoriteIds.has(post._id.toString())} 
                   />
 
                   {/* Featured Tag - Top-right */}
@@ -167,12 +166,12 @@ export default async function HouseListPage({ searchParams }) {
                   )}
 
                   {/* New Tag - Positioned to avoid conflict if both New and Featured */}
-                  {isNew && !post.isFeatured && ( // Only show 'New' if not already 'Featured'
+                  {isNew && !post.isFeatured && ( 
                     <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                       New
                     </div>
                   )}
-                  {isNew && post.isFeatured && ( // If both, show 'New' slightly offset
+                  {isNew && post.isFeatured && ( 
                     <div className="absolute top-2 right-[90px] bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                       New
                     </div>

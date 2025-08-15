@@ -23,7 +23,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     remeberMe: false, 
   });
 
-  // Load saved email from local storage on component mount 
   useEffect(() => {
     try {
       const savedEmail = localStorage.getItem('rememberedEmail');
@@ -70,7 +69,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
         if (formData.remeberMe) {
           localStorage.setItem('rememberedEmail', formData.emailAddress);
         } else {
-      
           localStorage.removeItem('rememberedEmail');
         }
 
@@ -80,7 +78,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
         setTimeout(() => {
           setShowStatusScreen(false);
           onClose();
-         
+          
           setFormData(prevData => ({
             ...prevData,
             password: '',
@@ -101,7 +99,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   return (
     <div className="fixed z-50 inset-0 overflow-y-auto bg-gray-500/60 bg-opacity-75 flex justify-center items-center p-4">
       <div className="relative bg-blue-50 rounded-lg shadow-xl w-full max-w-lg flex flex-col h-full overflow-hidden">
-        {/* Modal Header */}
         <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-200">
           <h3 className="text-2xl font-bold text-gray-900">Welcome to HomeLend</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
@@ -110,7 +107,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
         </div>
 
         {showStatusScreen ? (
-          // Status Screen (Success/Failure)
           <div className="h-screen p-6 flex-grow flex flex-col items-center justify-center text-center bg-white">
             {isSuccessStatus ? (
               <FaCheckCircle className="text-green-500 text-6xl mb-4" />
@@ -130,13 +126,11 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
             )}
           </div>
         ) : (
-          // Original Form Content
           <div className="p-6 flex-grow overflow-y-auto">
             <p className="text-sm text-gray-500 mb-6">
               Sign in or create an account to save favorites, get alerts, and more.
             </p>
 
-            {/* Google Sign-In Button */}
             <button
               type="button"
               onClick={() => {
@@ -151,13 +145,11 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
               {googleLoading ? <Spinner /> : <><i className="fab fa-google mr-2"></i> Sign in with Google</>}
             </button>
 
-            {/* Divider */}
             <div className="my-6 text-sm text-center text-gray-500 relative">
               <span className="bg-blue-50 px-2 relative z-10">Or continue with email</span>
               <div className="absolute inset-0 border-t border-gray-300 top-1/2 -translate-y-1/2" />
             </div>
 
-            {/* Email/Password Login Form */}
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700">Email address</label>
@@ -182,7 +174,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                 />
               </div>
 
-              {/* Remember Me and Forgot Password */}
               <div className="flex items-center justify-between">
                 <label className="flex items-center text-sm">
                   <input
@@ -197,7 +188,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                 <a href="/forgotpassword" target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm hover:underline">Forgot your password?</a>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
@@ -207,7 +197,6 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
               </button>
             </form>
 
-            {/* Switch to Signup Section */}
             <div className="mt-6 text-sm text-center text-gray-500">
               Don't have an account?
             </div>

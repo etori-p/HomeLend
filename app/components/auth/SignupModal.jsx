@@ -1,4 +1,3 @@
-// app/components/auth/SignupModal.jsx
 'use client';
 
 import { signIn } from 'next-auth/react';
@@ -90,9 +89,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 
   return (
     <div className="fixed z-50 inset-0 bg-gray-500/60 bg-opacity-75 flex justify-center items-center p-4">
-      {/* Main Modal Content Container */}
       <div className="relative bg-blue-50 rounded-lg shadow-xl w-full max-w-lg flex flex-col h-dvh overflow-hidden">
-        {/* Modal Header */}
         <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-200">
           <h3 className="text-2xl font-bold text-gray-900">Join HomeLend</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
@@ -101,7 +98,6 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
         </div>
 
         {showStatusScreen ? (
-          // Status Screen (Success/Failure)
           <div className="h-screen p-6 flex-grow flex flex-col items-center justify-center text-center bg-white">
             {isSuccessStatus ? (
               <FaCheckCircle className="text-green-500 text-6xl mb-4" />
@@ -121,15 +117,13 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
             )}
           </div>
         ) : (
-          // Original Form Content
           <div className="p-6 flex-grow overflow-y-auto">
-            {/* Success/Error messages for client-side validation or initial display */}
-            {success && !showStatusScreen && ( // Only show if not on status screen
+            {success && !showStatusScreen && (
               <p className="bg-green-600 text-white max-h-[90vh] text-sm px-4 py-2 rounded-md mb-4 text-center">
                 {success}
               </p>
             )}
-            {error && !showStatusScreen && ( // Only show if not on status screen
+            {error && !showStatusScreen && (
               <p className="bg-red-100 text-red-700 max-h-[90vh] text-sm p-3 rounded-md mb-4">{error}</p>
             )}
 
@@ -137,7 +131,6 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
               Create an account to save favorites, get alerts, and more.
             </p>
 
-            {/* Google Sign Up */}
             <button onClick={() => signIn('google')} className="w-full text-black py-2 rounded-md hover:bg-blue-300 hover:text-white mb-4 flex items-center justify-center border border-gray-300">
               <i className="fab fa-google mr-2"></i> Sign up with Google
             </button>

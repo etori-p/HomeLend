@@ -10,6 +10,7 @@ import Footer from './Footer';
  * It hides the Navbar and Footer for the specific `/rental-guide` page.
  */
 export default function ConditionalNavAndFooter({ children }) {
+  
   const pathname = usePathname();
   const showNavAndFooter = pathname !== '/rental-guide' && pathname !== '/faq' && pathname !== '/moving-checklist' && pathname !== '/tos'
     && pathname !== '/privacy-policy' && pathname !== '/cookie-policy';

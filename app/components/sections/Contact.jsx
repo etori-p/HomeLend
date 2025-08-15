@@ -58,7 +58,7 @@ export default function ContactPage() {
       }
 
       setSuccessMessage('Your message has been sent successfully! We will get back to you soon.');
-      setFormData({ // Reset form
+      setFormData({ 
         name: '',
         email: '',
         phone: '',

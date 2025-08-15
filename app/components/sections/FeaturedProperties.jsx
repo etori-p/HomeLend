@@ -7,12 +7,12 @@ import { FaHeart, FaMapMarkerAlt, FaBed, FaBath, FaVectorSquare, FaSpinner, FaSt
 import { useSession } from 'next-auth/react';
 import PropertyImage from '@/app/Listing/PropertyImage';
 
-// Simple Spinner Component
+
 const Spinner = ({ size = 'w-5 h-5', color = 'text-blue-500' }) => (
   <FaSpinner className={`${size} ${color} animate-spin`} />
 );
 
-// Function to randomly select N unique items from an array
+
 function getRandomUniqueItems(arr, numItems) {
   if (numItems >= arr.length) {
     return [...arr];
@@ -27,18 +27,18 @@ export default function FeaturedProperties() {
   const [selectedPosts, setSelectedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [userFavorites, setUserFavorites] = useState(new Set()); // Store user's favorite post IDs
+  const [userFavorites, setUserFavorites] = useState(new Set());
 
   const FOUR_DAYS_IN_MS = 4 * 24 * 60 * 60 * 1000;
-  const NUMBER_OF_FEATURED_TO_SHOW = 3; // Define how many featured properties you want
+  const NUMBER_OF_FEATURED_TO_SHOW = 3; 
 
   // Function to fetch all house data
   const fetchAllHouseData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      // 1. Fetch all properties first
-      const allRes = await fetch('http://localhost:3000/api/list');
+      
+      const allRes = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/list');
       if (!allRes.ok) {
         throw new Error('Failed to fetch all house data.');
       }
@@ -47,20 +47,20 @@ export default function FeaturedProperties() {
 
       let currentSelected = [];
 
-      // 2. Prioritize fetching truly featured properties
-      const featuredRes = await fetch('http://localhost:3000/api/list?featured=true');
+      
+      const featuredRes = await fetch('https://home-lend-etori-ps-projects.vercel.app/api/list?featured=true');
       let featuredData = [];
       if (featuredRes.ok) {
         featuredData = await featuredRes.json();
-        // Take up to NUMBER_OF_FEATURED_TO_SHOW featured properties
+        
         currentSelected = getRandomUniqueItems(featuredData, NUMBER_OF_FEATURED_TO_SHOW);
       } else {
         console.warn('Could not fetch explicitly featured properties. Falling back to all posts.');
       }
 
-      // 3. If not enough featured properties, fill with other random posts
+      
       if (currentSelected.length < NUMBER_OF_FEATURED_TO_SHOW) {
-        // Filter out already selected featured posts from allData
+      
         const remainingPosts = allData.filter(
           (post) => !currentSelected.some((selected) => selected._id === post._id)
         );
@@ -71,18 +71,18 @@ export default function FeaturedProperties() {
         currentSelected = [...currentSelected, ...additionalPosts];
       }
 
-      // Ensure we don't show more than NUMBER_OF_FEATURED_TO_SHOW
+    
       setSelectedPosts(currentSelected.slice(0, NUMBER_OF_FEATURED_TO_SHOW));
 
     } catch (err) {
-      console.error('Error fetching featured properties:', err);
+
       setError(err.message || 'Could not load featured properties.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Function to fetch user's favorite post IDs
+  // Function to fetch user favorites
   const fetchUserFavorites = useCallback(async () => {
     if (sessionStatus === 'authenticated') {
       try {
@@ -102,7 +102,7 @@ export default function FeaturedProperties() {
   }, [sessionStatus]);
 
 
-  // Initial data fetch and favorite fetch
+
   useEffect(() => {
     fetchAllHouseData();
   }, [fetchAllHouseData]);
@@ -141,9 +141,9 @@ export default function FeaturedProperties() {
         // Revert optimistic update if API call fails
         setUserFavorites(prev => {
           const newFavorites = new Set(prev);
-          if (isCurrentlyFavorited) { // If it was favorited, add it back
+          if (isCurrentlyFavorited) { 
             newFavorites.add(postId);
-          } else { // If it was not favorited, remove it
+          } else { 
             newFavorites.delete(postId);
           }
           return newFavorites;
@@ -211,7 +211,7 @@ export default function FeaturedProperties() {
 
               const postCreationDate = new Date(post.createdAt);
               const isNew = (Date.now() - postCreationDate.getTime()) < FOUR_DAYS_IN_MS;
-              const isFavorited = userFavorites.has(post._id); // Check if post is favorited by user
+              const isFavorited = userFavorites.has(post._id);
 
               return (
                 <div key={post._id} className="property-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300 ease-in-out">
@@ -221,7 +221,7 @@ export default function FeaturedProperties() {
                       src={displayImage}
                       alt={post.propertyname}
                     />
-                    {/* Like/Favorite Button - Always top-left */}
+                    {/* Like/Favorite Button */}
                     {sessionStatus === 'authenticated' && (
                       <button
                         onClick={() => handleToggleFavorite(post._id)}
@@ -233,20 +233,20 @@ export default function FeaturedProperties() {
                       </button>
                     )}
 
-                    {/* Featured Tag - Top-right */}
+                    {/* Featured Tag */}
                     {post.isFeatured && (
                       <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-md text-xs font-semibold flex items-center">
                         <FaStar className="inline-block mr-1" /> Featured
                       </div>
                     )}
 
-                    {/* New Tag - Positioned to avoid conflict if both New and Featured */}
-                    {isNew && !post.isFeatured && ( // Only show 'New' if not already 'Featured'
+                    {/* Positioned to avoid conflict if both New and Featured */}
+                    {isNew && !post.isFeatured && ( 
                       <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                         New
                       </div>
                     )}
-                    {isNew && post.isFeatured && ( // If both, show 'New' slightly offset
+                    {isNew && post.isFeatured && (
                       <div className="absolute top-2 right-[90px] bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                         New
                       </div>

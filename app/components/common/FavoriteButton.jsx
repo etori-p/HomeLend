@@ -1,23 +1,13 @@
-// app/components/common/FavoriteButton.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { FaHeart } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
 
-/**
- * Client-side component for a favorite button.
- * It handles toggling a post's favorite status for the logged-in user.
- *
- * @param {object} props - The component props.
- * @param {string} props.postId - The ID of the house post.
- * @param {boolean} props.initialIsFavorited - Initial favorite status from the server.
- */
 export default function FavoriteButton({ postId, initialIsFavorited }) {
   const { data: session, status: sessionStatus } = useSession();
   const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
 
-  // Update internal state if initialIsFavorited prop changes (e.g., on re-render from server)
   useEffect(() => {
     setIsFavorited(initialIsFavorited);
   }, [initialIsFavorited]);
@@ -28,7 +18,6 @@ export default function FavoriteButton({ postId, initialIsFavorited }) {
       return;
     }
 
-    // Optimistic update
     setIsFavorited(prev => !prev);
 
     try {
@@ -39,22 +28,19 @@ export default function FavoriteButton({ postId, initialIsFavorited }) {
       });
 
       if (!res.ok) {
-        // Revert optimistic update if API call fails
         setIsFavorited(prev => !prev);
         const errorData = await res.json();
         throw new Error(errorData.message || 'Failed to update favorite status.');
       }
     } catch (err) {
-      console.error('Error toggling favorite:', err);
-      alert('Failed to update favorite status. Please try again.'); // Use a custom modal
+       alert('Failed to update favorite status. Please try again.'); // Use a custom modal
     }
   };
 
   if (sessionStatus === 'loading') {
-    return null; // Don't render button until session status is known
+    return null;
   }
 
-  // Only show the button if the user is authenticated
   if (sessionStatus !== 'authenticated') {
     return null;
   }

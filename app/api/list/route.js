@@ -1,4 +1,3 @@
-// app/api/list/route.js
 import { NextResponse } from "next/server";
 import connectToMongoDB from "@/lib/mongodb";
 import Houselistpost from "@/app/models/Houselistpost";
@@ -27,7 +26,6 @@ const uploadToCloudinary = (fileBuffer) => {
   });
 };
 
-// --- GET FUNCTION (Fetch all listings) ---
 export const GET = async (request) => {
   try {
     await connectToMongoDB();
@@ -49,7 +47,6 @@ export const GET = async (request) => {
 
     return new NextResponse(JSON.stringify(posts), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
-    console.error("Database Error (GET):", error);
     return new NextResponse(JSON.stringify({ message: 'Database Error!', details: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -57,7 +54,6 @@ export const GET = async (request) => {
   }
 }
 
-// --- POST FUNCTION (Create new listing) ---
 export const POST = async (request) => {
   try {
     const formData = await request.formData();
@@ -97,7 +93,6 @@ export const POST = async (request) => {
       propertytype: formData.get("propertytype"),
       isFeatured: formData.get("isFeatured") === 'true', 
       coordinates: JSON.parse(formData.get("coordinates")),
-      // <<< ADDED: Agent details for POST
       agentName: formData.get("agentName") || undefined, 
       agentContactEmail: formData.get("agentContactEmail") || undefined,
       agentContactPhone: formData.get("agentContactPhone") || undefined,
@@ -111,7 +106,6 @@ export const POST = async (request) => {
     });
 
   } catch (error) {
-    console.error("Failed to create post:", error);
     return new NextResponse(JSON.stringify({
       message: 'Failed to create post!',
       details: error.message
@@ -122,7 +116,6 @@ export const POST = async (request) => {
   }
 }
 
-// --- PUT FUNCTION (Update existing listing) ---
 export const PUT = async (request) => {
   try {
     await connectToMongoDB();
@@ -172,7 +165,6 @@ export const PUT = async (request) => {
       propertytype: formData.get("propertytype"),
       isFeatured: formData.get("isFeatured") === 'true',
       coordinates: JSON.parse(formData.get("coordinates")),
-      // Agent details for PUT
       agentName: formData.get("agentName") || undefined,
       agentContactEmail: formData.get("agentContactEmail") || undefined,
       agentContactPhone: formData.get("agentContactPhone") || undefined,
@@ -193,7 +185,6 @@ export const PUT = async (request) => {
     });
 
   } catch (error) {
-    console.error("Failed to update post:", error);
     return new NextResponse(JSON.stringify({
       message: 'Failed to update post!',
       details: error.message
@@ -204,7 +195,6 @@ export const PUT = async (request) => {
   }
 }
 
-// --- DELETE FUNCTION (Delete existing listing) ---
 export const DELETE = async (request) => {
   try {
     await connectToMongoDB();
@@ -233,7 +223,6 @@ export const DELETE = async (request) => {
     });
 
   } catch (error) {
-    console.error("Failed to delete post:", error);
     return new NextResponse(JSON.stringify({
       message: 'Failed to delete post!',
       details: error.message

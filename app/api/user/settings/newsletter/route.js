@@ -1,11 +1,9 @@
-// app/api/user/settings/newsletter/route.js
 import { NextResponse } from 'next/server';
 import connectToMongoDB from '@/lib/mongodb';
 import User from '@/app/models/User';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'; 
 
-// --- GET FUNCTION (Fetch Newsletter Subscription Status) ---
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -24,12 +22,10 @@ export async function GET(req) {
     return NextResponse.json({ isSubscribed: user.isSubscribedToNewsletter }, { status: 200 });
 
   } catch (error) {
-    console.error('API Error (GET /api/user/settings/newsletter):', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
-// --- PUT FUNCTION (Update Newsletter Subscription Status) ---
 export async function PUT(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,7 +53,6 @@ export async function PUT(req) {
     return NextResponse.json({ message: 'Subscription updated successfully', isSubscribed: user.isSubscribedToNewsletter }, { status: 200 });
 
   } catch (error) {
-    console.error('API Error (PUT /api/user/settings/newsletter):', error);
     return NextResponse.json({ message: 'Server error during newsletter update' }, { status: 500 });
   }
 }

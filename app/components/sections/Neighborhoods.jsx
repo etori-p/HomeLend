@@ -1,4 +1,4 @@
-// app/components/sections/Neighborhoods.jsx
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -14,9 +14,9 @@ function Neighborhoods() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const postsPerPage = 3;
-  const refreshInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const refreshInterval = 5 * 60 * 1000; 
 
-  // --- Fetching and Initializing Data ---
+  // Fetching and Initializing Data
   useEffect(() => {
     const fetchAllNeighborhoods = async () => {
       try {
@@ -51,30 +51,30 @@ function Neighborhoods() {
     };
 
     fetchAllNeighborhoods();
-  }, []); // Empty dependency array ensures this runs only once on mount.
+  }, []); 
 
-  // --- Refreshing Posts Every 5 Minutes ---
+  // Refreshing Posts Every 5 Minutes
   useEffect(() => {
-    // Only set up the interval if we have data
+    
     if (allNeighborhoods.length > 0) {
       const interval = setInterval(() => {
-        // Calculate the next index, looping back to the start if needed
+       
         setCurrentIndex(prevIndex => {
           const nextIndex = prevIndex + postsPerPage;
           return nextIndex >= allNeighborhoods.length ? 0 : nextIndex;
         });
       }, refreshInterval);
 
-      // Clean up the interval when the component unmounts
+      
       return () => clearInterval(interval);
     }
-  }, [allNeighborhoods]); // Dependency array ensures this runs when data is fetched.
+  }, [allNeighborhoods]); 
 
-  // --- Update displayed posts when currentIndex changes ---
+  // Update displayed posts when currentIndex changes
   useEffect(() => {
     const end = currentIndex + postsPerPage;
     const newPosts = allNeighborhoods.slice(currentIndex, end);
-    // If the next slice is empty, wrap around to the beginning
+    
     setDisplayedNeighborhoods(newPosts.length > 0 ? newPosts : allNeighborhoods.slice(0, postsPerPage));
   }, [currentIndex, allNeighborhoods]);
 

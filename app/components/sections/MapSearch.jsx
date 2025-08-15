@@ -16,7 +16,7 @@ const loadGoogleMapsScript = (apiKey) => {
     // Check if the script is already being loaded
     if (document.getElementById('google-maps-script')) {
         const checkMaps = setInterval(() => {
-            if (window.google && window.google.maps && window.google.maps.Map) { // Check for Map constructor
+            if (window.google && window.google.maps && window.google.maps.Map) { 
                 clearInterval(checkMaps);
                 resolve(window.google);
             }
@@ -25,7 +25,7 @@ const loadGoogleMapsScript = (apiKey) => {
     }
 
     const script = document.createElement('script');
-    script.id = 'google-maps-script'; // Add an ID to prevent duplicate loading
+    script.id = 'google-maps-script'; 
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
     script.async = true;
     script.defer = true;
@@ -33,7 +33,7 @@ const loadGoogleMapsScript = (apiKey) => {
     script.onload = () => {
       // Poll until google.maps and the Map constructor are truly ready
       const checkMapsInterval = setInterval(() => {
-        if (window.google && window.google.maps && window.google.maps.Map) { // Check for Map constructor
+        if (window.google && window.google.maps && window.google.maps.Map) { 
           clearInterval(checkMapsInterval);
           resolve(window.google);
         }
@@ -101,10 +101,10 @@ function MapSearch() {
             throw new Error("Google Maps API or Map constructor not fully loaded.");
         }
 
-        // --- IMPORTANT: Only create a new map if it doesn't already exist ---
+        //IMPORTANT: Only create a new map if it doesn't already exist 
         if (mapRef.current && !googleMap.current) { 
           googleMap.current = new google.maps.Map(mapRef.current, {
-            center: { lat: -1.286389, lng: 36.817223 }, // Center of Nairobi
+            center: { lat: -1.286389, lng: 36.817223 }, 
             zoom: 12,
             mapTypeControl: false,
             streetViewControl: false,
@@ -115,7 +115,7 @@ function MapSearch() {
             console.log('Map clicked at:', e.latLng.lat(), e.latLng.lng());
           });
 
-          fetchProperties(); // Fetch properties once map is initialized
+          fetchProperties(); 
         }
       } catch (err) {
         console.error("Failed to load Google Maps:", err);
@@ -125,7 +125,7 @@ function MapSearch() {
 
     initMap();
 
-    // --- IMPORTANT: Cleanup function for when the component unmounts ---
+    // IMPORTANT: Cleanup function for when the component unmounts 
     return () => {
       
       if (googleMap.current && typeof googleMap.current.setDiv === 'function') {
@@ -143,7 +143,7 @@ function MapSearch() {
         markersRef.current = [];
       }
     };
-  }, [fetchProperties]); // `fetchProperties` is stable due to useCallback
+  }, [fetchProperties]);
 
   useEffect(() => {
     // Ensure google.maps and necessary constructors are ready before trying to create markers

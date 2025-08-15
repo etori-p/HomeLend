@@ -18,13 +18,13 @@ const firebaseConfig = {
 };
 
 const Newsletter = () => {
-    // State for the email input
+   
     const [email, setEmail] = useState('');
-    // State for handling loading/submission status
+  
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // State for user feedback messages
+    
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+    const [messageType, setMessageType] = useState('');
 
     // Firebase setup state
     const [db, setDb] = useState(null);
@@ -35,7 +35,7 @@ const Newsletter = () => {
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
     
-    // --- Initialize Firebase and Authenticate ---
+    // Initialize Firebase and Authenticate
     useEffect(() => {
         const initFirebase = async () => {
             try {
@@ -62,20 +62,20 @@ const Newsletter = () => {
         initFirebase();
     }, [initialAuthToken]);
 
-    // --- Message timeout effect ---
+    // Message timeout effect
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
                 setMessage('');
                 setMessageType('');
-            }, 5000); // 5 seconds
+            }, 5000); 
             
             // Cleanup function to clear the timeout if the component unmounts
             return () => clearTimeout(timer);
         }
     }, [message]);
 
-    // --- Form submission handler ---
+    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
         

@@ -1,4 +1,3 @@
-// app/api/contact/route.js
 import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail'; 
 
@@ -9,12 +8,10 @@ export async function POST(request) {
   try {
     const { name, email, phone, message } = await request.json();
 
-    // Basic validation (can be more robust)
     if (!name || !email || !message) {
       return NextResponse.json({ message: 'Name, email, and message are required.' }, { status: 400 });
     }
 
-    // Construct the email message
     const msg = {
       to: process.env.SENDGRID_TO_EMAIL || 'cody26946@gmail.com', 
       from: process.env.SENDGRID_FROM_EMAIL, 
@@ -29,15 +26,10 @@ export async function POST(request) {
       `,
     };
 
-    // Send the email
     await sgMail.send(msg);
-
-    console.log('Contact form email sent successfully!');
 
     return NextResponse.json({ message: 'Your message has been sent successfully! We will get back to you soon.' }, { status: 200 });
   } catch (error) {
-    console.error('Error sending contact form email:', error);
-    // Provide a more generic error message to the user for security
     return NextResponse.json({ message: 'There was an error sending your message. Please try again.' }, { status: 500 });
   }
 }

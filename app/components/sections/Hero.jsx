@@ -62,7 +62,7 @@ function Hero() {
           </div>
        
           <div className="lg:col-span-6">
-            {/* This column is now just an empty space or can be used for other content if needed */}
+
           </div>
         </div>
       </div>

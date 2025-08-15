@@ -1,4 +1,3 @@
-// app/api/auth/[...nextauth]/route.jsx
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -45,7 +44,7 @@ export const authOptions = {
           };
 
         } catch (error) {
-          console.error("Authorization error:", error.message);
+          // Removed console.error for production build
           throw new Error(error.message || "Something went wrong during login.");
         }
       }
@@ -70,7 +69,7 @@ export const authOptions = {
             image: user.image || '',
             agreeTS: true, 
             password: hashedPassword,
-            role: 'user', // <<< ADDED: Default role for new Google sign-ups
+            role: 'user',
           });
         } else {
           // Update existing user's image/name if changed via Google, and ensure role exists
@@ -78,7 +77,7 @@ export const authOptions = {
             existingUser.image = user.image;
             existingUser.firstName = user.name?.split(' ')[0] || existingUser.firstName;
             existingUser.lastName = user.name?.split(' ')[1] || existingUser.lastName;
-            // Ensure role is set if it's missing (e.g., for old users without a role field)
+            
             if (!existingUser.role) {
               existingUser.role = 'user';
             }
@@ -116,7 +115,7 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     // signIn: '/auth/signin', // Uncomment and create if you have a custom sign-in page
-    // error: '/auth/error',   // Uncomment and create if you have a custom error page
+    // error: '/auth/error',   // Uncomment and create if you have a custom error page
   },
 };
 

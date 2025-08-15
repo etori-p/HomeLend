@@ -61,7 +61,7 @@ export default function FavoritesPage() {
       setError('You must be logged in to modify favorites.');
       return;
     }
-    setLoading(true); // Show loading while updating
+    setLoading(true); 
     try {
       const res = await fetch('/api/user/favorites', {
         method: 'POST',
@@ -78,7 +78,7 @@ export default function FavoritesPage() {
 
       // After successful removal, refetch the list to update UI
       await fetchFavoritePosts();
-      // You could also optimistically update the state:
+     
       setFavoritePosts(prev => prev.filter(post => post._id !== postId));
     } catch (err) {
       console.error('Error removing favorite:', err);

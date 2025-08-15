@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { FaStar, FaRegStar, FaSpinner, FaPaperPlane, FaTimesCircle } from 'react-icons/fa';
 
-// Simple Spinner Component
+
 const Spinner = ({ size = 'w-5 h-5', color = 'text-blue-500' }) => (
   <FaSpinner className={`${size} ${color} animate-spin`} />
 );
@@ -96,13 +96,13 @@ export default function Testimonials() {
     fetchTestimonials();
   }, [fetchTestimonials]);
 
-  // --- Automatic Random Refresh for Mobile (Every 5 seconds) ---
+  //  Automatic Random Refresh for Mobile 
   useEffect(() => {
     // Only run this on mobile-sized screens
     if (isMobile && testimonials.length > 0) {
       const refreshInterval = setInterval(() => {
         setMobileDisplayTestimonials(getRandomTestimonials(testimonials, 3));
-      }, 5000); // Refresh every 5 seconds
+      }, 5000); 
 
       // Clean up the interval on component unmount or when not on mobile
       return () => clearInterval(refreshInterval);
@@ -111,7 +111,7 @@ export default function Testimonials() {
     return;
   }, [isMobile, testimonials]);
 
-  // --- Automatic Horizontal Scrolling for Desktop ---
+  //  Automatic Horizontal Scrolling for Desktop 
   useEffect(() => {
     const container = scrollRef.current;
     // Only run this on non-mobile sized screens
@@ -125,7 +125,7 @@ export default function Testimonials() {
     // Interval to trigger the scroll every 6 seconds
     scrollInterval.current = setInterval(() => {
       const cardWidth = container.children[0]?.offsetWidth || 0;
-      const scrollAmount = cardWidth + 32; // card width + gap (space-x-8 = 2rem = 32px)
+      const scrollAmount = cardWidth + 32; 
       
       const originalContentWidth = cardWidth * testimonials.length + 32 * (testimonials.length - 1);
 
@@ -310,8 +310,8 @@ export default function Testimonials() {
             <div 
               ref={scrollRef}
               className="mt-16 hidden sm:flex overflow-x-auto scroll-smooth snap-x snap-mandatory space-x-8 pb-4 hide-scrollbar"
-              onMouseEnter={() => setIsScrolling(false)} // Pause desktop scroll on hover
-              onMouseLeave={() => setIsScrolling(true)} // Resume desktop scroll on leave
+              onMouseEnter={() => setIsScrolling(false)}
+              onMouseLeave={() => setIsScrolling(true)} 
             >
               {duplicatedTestimonials.map((testimonial, index) => (
                 <div 

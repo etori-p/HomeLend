@@ -1,4 +1,3 @@
-// app/api/user/profile/route.js
 import { NextResponse } from 'next/server';
 import connectToMongoDB from '@/lib/mongodb';
 import User from '@/app/models/User';
@@ -6,14 +5,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary using your environment variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Helper function to upload buffer to Cloudinary
 const uploadToCloudinary = (fileBuffer) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -30,7 +27,6 @@ const uploadToCloudinary = (fileBuffer) => {
   });
 };
 
-// --- GET FUNCTION (Fetch User Profile) ---
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,7 +42,6 @@ export async function GET(req) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    // Return specific profile data including lastNamesUpdate
     return NextResponse.json({
       firstName: user.firstName,
       lastName: user.lastName,
@@ -57,12 +52,10 @@ export async function GET(req) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error('API Error (GET /api/user/profile):', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
 
-// --- PUT FUNCTION (Update User Profile) ---
 export async function PUT(req) {
   try {
     const session = await getServerSession(authOptions);
@@ -86,7 +79,6 @@ export async function PUT(req) {
 
     const errors = {};
 
-    // Validate Date of Birth (18+ years)
     if (!dateOfBirthString) {
       errors.dateOfBirth = 'Date of Birth is required.';
     } else {
@@ -99,9 +91,8 @@ export async function PUT(req) {
       }
     }
 
-    // Handle First Name and Last Name updates with 3-month restriction
     const namesChanged = (newFirstName !== user.firstName || newLastName !== user.lastName);
-    const threeMonthsInMs = 3 * 30 * 24 * 60 * 60 * 1000; // Approximate 3 months
+    const threeMonthsInMs = 3 * 30 * 24 * 60 * 60 * 1000;
 
     if (namesChanged) {
       if (user.lastNamesUpdate) {
@@ -112,7 +103,6 @@ export async function PUT(req) {
           errors.names = 'Names can only be updated once every 3 months.';
         }
       }
-      // If names are changing and no restriction, update them
       if (!errors.names) {
         user.firstName = newFirstName;
         user.lastName = newLastName;
@@ -124,8 +114,7 @@ export async function PUT(req) {
       return NextResponse.json({ message: 'Validation failed', errors }, { status: 400 });
     }
 
-    // Handle Profile Image update
-    let imageUrl = user.image; // Default to existing image
+    let imageUrl = user.image;
     if (profileImageFile && profileImageFile.size > 0) {
       const arrayBuffer = await profileImageFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -133,13 +122,11 @@ export async function PUT(req) {
       imageUrl = uploadResult.secure_url;
     }
 
-    // Update fields that are always editable
     user.image = imageUrl;
     user.dateOfBirth = new Date(dateOfBirthString);
 
     await user.save();
 
-    // Return updated user data including the new lastNamesUpdate timestamp
     return NextResponse.json({
       message: 'Profile updated successfully',
       user: {
@@ -153,7 +140,6 @@ export async function PUT(req) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error('API Error (PUT /api/user/profile):', error);
     return NextResponse.json({ message: 'Server error during profile update' }, { status: 500 });
   }
 }

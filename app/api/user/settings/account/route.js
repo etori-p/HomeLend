@@ -30,7 +30,7 @@ export async function DELETE(req) {
     return NextResponse.json({ message: 'Account deleted successfully' }, { status: 200 });
 
   } catch (error) {
-    console.error('API Error (DELETE /api/user/settings/account):', error);
+
     return NextResponse.json({ message: 'Server error during account deletion' }, { status: 500 });
   }
 }
