@@ -1,3 +1,4 @@
+//app/api/list/route.js
 import { NextResponse } from "next/server";
 import connectToMongoDB from "@/lib/mongodb";
 import Houselistpost from "@/app/models/Houselistpost";

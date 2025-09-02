@@ -9,17 +9,16 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
 import { headers } from 'next/headers';
 
-
 export const metadata = {
   title: 'All Properties | HomeLend',
   description: 'Browse all properties for rent, including apartments, houses, and studios. Use our powerful search and filter tools to find your perfect home in any neighborhood.',
   openGraph: {
     title: 'All Properties | HomeLend',
     description: 'Find your next rental home with HomeLend. Search and filter through a wide variety of properties available across multiple locations.',
-    url: 'https://homelend.co.ke/Listing', 
+    url: 'https://homelend.co.ke/Listing',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1512917772847-f823297a7a6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=600&q=80', // Replace with a generic image for the listings page
+        url: 'https://images.unsplash.com/photo-1512917772847-f823297a7a6e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&h=600&q=80',
         width: 800,
         height: 600,
         alt: 'A collection of rental properties',
@@ -28,8 +27,16 @@ export const metadata = {
   },
 };
 
+// Helper function to get the base URL
+function getBaseUrl() {
+  const host = headers().get('host');
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  return `${protocol}://${host}`;
+}
+
 async function getAllHouseData() {
-  const res = await fetch('api/list', {
+  const baseUrl = getBaseUrl();
+  const res = await fetch(`${baseUrl}/api/list`, {
     next: { revalidate: 300 }
   });
 
@@ -44,17 +51,18 @@ async function getAllHouseData() {
 // Fetch user's favorite post IDs on the server
 async function getUserFavoriteIds(session) {
   if (!session || !session.user || !session.user.email) {
-    return new Set(); 
+    return new Set();
   }
   try {
-    const headersList = await headers(); 
-    const cookie = headersList.get('cookie'); 
+    const baseUrl = getBaseUrl();
+    const headersList = headers();
+    const cookie = headersList.get('cookie');
 
-    const res = await fetch('api/user/favorites', {
+    const res = await fetch(`${baseUrl}/api/user/favorites`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(cookie && { 'Cookie': cookie }), 
+        ...(cookie && { 'Cookie': cookie }),
       },
     });
 
@@ -70,71 +78,48 @@ async function getUserFavoriteIds(session) {
   }
 }
 
-
 // HouseListPage is an async Server Component, receiving searchParams
 export default async function HouseListPage({ searchParams }) {
- 
-  const awaitedSearchParams = await searchParams;
-
-
+  const awaitedSearchParams = searchParams;
   const session = await getServerSession(authOptions);
-  const userFavoriteIds = await getUserFavoriteIds(session); 
-
-
+  const userFavoriteIds = await getUserFavoriteIds(session);
   const allHouseListings = await getAllHouseData();
-
- 
   const searchTerm = awaitedSearchParams.search || '';
   const propertyTypeFilter = awaitedSearchParams.propertyType || 'Any';
   const bedroomsFilter = awaitedSearchParams.bedrooms || 'Any';
   const minPrice = awaitedSearchParams.minPrice || '';
   const maxPrice = awaitedSearchParams.maxPrice || '';
-
- 
   const locationFilter = awaitedSearchParams.location || '';
-
-
+  
   const filteredListings = allHouseListings.filter(Listing => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
-
-    const matchesSearchTerm = searchTerm
-      ? (Listing.propertyname.toLowerCase().includes(lowercasedSearchTerm) ||
-        Listing.location.toLowerCase().includes(lowercasedSearchTerm) ||
-        (Listing.propertytype && Listing.propertytype.toLowerCase().includes(lowercasedSearchTerm)) ||
-        (Listing.description && Listing.description.toLowerCase().includes(lowercasedSearchTerm)) ||
-        (Listing.features?.bedrooms && Listing.features.bedrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
-        (Listing.features?.bathrooms && Listing.features.bathrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
-        (Listing.features?.size && Listing.features.size.toLowerCase().includes(lowercasedSearchTerm)))
-      : true;
-
-    const matchesLocation = locationFilter
-      ? Listing.location.toLowerCase().includes(locationFilter.toLowerCase())
-      : true;
-
-    const matchesPropertyType = propertyTypeFilter === 'Any'
-      ? true
-      : Listing.propertytype === propertyTypeFilter;
-
-    const matchesBedrooms = bedroomsFilter === 'Any'
-      ? true
-      : (bedroomsFilter === '4+'
-        ? parseInt(Listing.features?.bedrooms) >= 4
-        : parseInt(Listing.features?.bedrooms) === parseInt(bedroomsFilter));
-
+    const matchesSearchTerm = searchTerm ? (
+      Listing.propertyname.toLowerCase().includes(lowercasedSearchTerm) ||
+      Listing.location.toLowerCase().includes(lowercasedSearchTerm) ||
+      (Listing.propertytype && Listing.propertytype.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (Listing.description && Listing.description.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (Listing.features?.bedrooms && Listing.features.bedrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (Listing.features?.bathrooms && Listing.features.bathrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
+      (Listing.features?.size && Listing.features.size.toLowerCase().includes(lowercasedSearchTerm))
+    ) : true;
+    
+    const matchesLocation = locationFilter ? Listing.location.toLowerCase().includes(locationFilter.toLowerCase()) : true;
+    const matchesPropertyType = propertyTypeFilter === 'Any' ? true : Listing.propertytype === propertyTypeFilter;
+    const matchesBedrooms = bedroomsFilter === 'Any' ? true : (
+      bedroomsFilter === '4+' ? parseInt(Listing.features?.bedrooms) >= 4 : parseInt(Listing.features?.bedrooms) === parseInt(bedroomsFilter)
+    );
+    
     const propertyPriceNum = parseFloat(Listing.price.replace(/[^0-9.-]+/g, ""));
     const matchesMinPrice = minPrice ? propertyPriceNum >= parseFloat(minPrice) : true;
     const matchesMaxPrice = maxPrice ? propertyPriceNum <= parseFloat(maxPrice) : true;
-
-    // --- UPDATE THE RETURN STATEMENT ---
+    
     return matchesSearchTerm && matchesPropertyType && matchesBedrooms && matchesMinPrice && matchesMaxPrice && matchesLocation;
   });
-
+  
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-8">All Properties</h1>
-
       <HouseListFilters initialSearchParams={searchParams} />
-
       {filteredListings.length === 0 ? (
         <p className="text-center text-gray-600 text-lg">No properties found matching your criteria.</p>
       ) : (
@@ -143,7 +128,7 @@ export default async function HouseListPage({ searchParams }) {
             const postCreationDate = new Date(post.createdAt);
             const isNew = (Date.now() - postCreationDate.getTime()) < (4 * 24 * 60 * 60 * 1000); // 4 days
             const featuresObj = post.features;
-
+            
             return (
               <div key={post._id} className="property-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition duration-300 ease-in-out">
                 <div className="relative h-48 overflow-hidden">
@@ -154,24 +139,22 @@ export default async function HouseListPage({ searchParams }) {
                   />
                   {/* Favorite Button (Client Component) */}
                   <FavoriteButton
-                    postId={post._id.toString()} 
-                    initialIsFavorited={userFavoriteIds.has(post._id.toString())} 
+                    postId={post._id.toString()}
+                    initialIsFavorited={userFavoriteIds.has(post._id.toString())}
                   />
-
                   {/* Featured Tag - Top-right */}
                   {post.isFeatured && (
                     <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-md text-xs font-semibold flex items-center">
                       <FaStar className="inline-block mr-1" /> Featured
                     </div>
                   )}
-
                   {/* New Tag - Positioned to avoid conflict if both New and Featured */}
-                  {isNew && !post.isFeatured && ( 
+                  {isNew && !post.isFeatured && (
                     <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                       New
                     </div>
                   )}
-                  {isNew && post.isFeatured && ( 
+                  {isNew && post.isFeatured && (
                     <div className="absolute top-2 right-[90px] bg-green-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
                       New
                     </div>
