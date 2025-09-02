@@ -7,7 +7,6 @@ import PropertyImage from '@/app/Listing/PropertyImage';
 import FavoriteButton from '@/app/components/common/FavoriteButton';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
-import { headers } from 'next/headers';
 
 export const metadata = {
   title: 'All Properties | HomeLend',
@@ -27,16 +26,8 @@ export const metadata = {
   },
 };
 
-// Helper function to get the base URL
-function getBaseUrl() {
-  const host = headers().get('host');
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
-  return `${protocol}://${host}`;
-}
-
 async function getAllHouseData() {
-  const baseUrl = getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/list`, {
+  const res = await fetch('/api/list', {
     next: { revalidate: 300 }
   });
 
@@ -48,21 +39,15 @@ async function getAllHouseData() {
   return res.json();
 }
 
-// Fetch user's favorite post IDs on the server
 async function getUserFavoriteIds(session) {
   if (!session || !session.user || !session.user.email) {
     return new Set();
   }
   try {
-    const baseUrl = getBaseUrl();
-    const headersList = headers();
-    const cookie = headersList.get('cookie');
-
-    const res = await fetch(`${baseUrl}/api/user/favorites`, {
+    const res = await fetch('/api/user/favorites', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(cookie && { 'Cookie': cookie }),
       },
     });
 
@@ -78,18 +63,16 @@ async function getUserFavoriteIds(session) {
   }
 }
 
-// HouseListPage is an async Server Component, receiving searchParams
 export default async function HouseListPage({ searchParams }) {
-  const awaitedSearchParams = searchParams;
   const session = await getServerSession(authOptions);
   const userFavoriteIds = await getUserFavoriteIds(session);
   const allHouseListings = await getAllHouseData();
-  const searchTerm = awaitedSearchParams.search || '';
-  const propertyTypeFilter = awaitedSearchParams.propertyType || 'Any';
-  const bedroomsFilter = awaitedSearchParams.bedrooms || 'Any';
-  const minPrice = awaitedSearchParams.minPrice || '';
-  const maxPrice = awaitedSearchParams.maxPrice || '';
-  const locationFilter = awaitedSearchParams.location || '';
+  const searchTerm = searchParams.search || '';
+  const propertyTypeFilter = searchParams.propertyType || 'Any';
+  const bedroomsFilter = searchParams.bedrooms || 'Any';
+  const minPrice = searchParams.minPrice || '';
+  const maxPrice = searchParams.maxPrice || '';
+  const locationFilter = searchParams.location || '';
   
   const filteredListings = allHouseListings.filter(Listing => {
     const lowercasedSearchTerm = searchTerm.toLowerCase();
@@ -98,9 +81,10 @@ export default async function HouseListPage({ searchParams }) {
       Listing.location.toLowerCase().includes(lowercasedSearchTerm) ||
       (Listing.propertytype && Listing.propertytype.toLowerCase().includes(lowercasedSearchTerm)) ||
       (Listing.description && Listing.description.toLowerCase().includes(lowercasedSearchTerm)) ||
-      (Listing.features?.bedrooms && Listing.features.bedrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
-      (Listing.features?.bathrooms && Listing.features.bathrooms.toLowerCase().includes(lowercasedSearchTerm)) ||
-      (Listing.features?.size && Listing.features.size.toLowerCase().includes(lowercasedSearchTerm))
+      // Corrected: Convert numerical features to strings for searching
+      (Listing.features?.bedrooms && String(Listing.features.bedrooms).includes(lowercasedSearchTerm)) ||
+      (Listing.features?.bathrooms && String(Listing.features.bathrooms).includes(lowercasedSearchTerm)) ||
+      (Listing.features?.size && String(Listing.features.size).toLowerCase().includes(lowercasedSearchTerm))
     ) : true;
     
     const matchesLocation = locationFilter ? Listing.location.toLowerCase().includes(locationFilter.toLowerCase()) : true;
@@ -208,3 +192,4 @@ export default async function HouseListPage({ searchParams }) {
     </div>
   );
 }
+
