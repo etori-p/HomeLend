@@ -54,7 +54,11 @@ export async function generateMetadata({ params }) {
 async function getSingleHouseData(propertyname) {
   // Decode the propertyname to handle spaces correctly
   const decodedPropertyName = decodeURIComponent(propertyname);
-  const baseUrl = process.env.VERCEL_URL `https://${process.env.VERCEL_URL}`;   
+  // Use VERCEL_URL for production and localhost for development
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'; 
+
   const res = await fetch(`${baseUrl}/api/list/${encodeURIComponent(decodedPropertyName)}`, {
     cache: 'no-store'
   });
