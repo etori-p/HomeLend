@@ -38,7 +38,7 @@ export default function FeaturedProperties() {
     setError('');
     try {
       
-      const allRes = await fetch('https://home-lend-git-master-etori-ps-projects.vercel.app/api/list');
+      const allRes = await fetch('https://home-lend.vercel.app/api/list');
       if (!allRes.ok) {
         throw new Error('Failed to fetch all house data.');
       }
@@ -48,7 +48,7 @@ export default function FeaturedProperties() {
       let currentSelected = [];
 
       
-      const featuredRes = await fetch('https://home-lend-git-master-etori-ps-projects.vercel.app/api/list?featured=true');
+      const featuredRes = await fetch('https://home-lend.vercel.app/api/list?featured=true');
       let featuredData = [];
       if (featuredRes.ok) {
         featuredData = await featuredRes.json();
